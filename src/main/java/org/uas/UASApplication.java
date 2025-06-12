@@ -20,7 +20,7 @@ public class UASApplication {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             isLogin = SessionManager.getInstance().isLoggedIn();
-            System.out.println("UAS");
+            System.out.println("\n=== UAS User Management System ===");
             System.out.println("0. Exit");
             if (isLogin) {
                 System.out.println("2. Tampilkan Semua User");
@@ -42,8 +42,9 @@ public class UASApplication {
                     }
                 }
             } catch (NumberFormatException | NullPointerException e) {
-                System.out.print("Pilihan harus berupa angka!\n");
+                System.out.println("Pilihan harus berupa angka!");
             }
+
             switch (choice) {
                 case 0:
                     exitApps();
@@ -66,9 +67,9 @@ public class UASApplication {
                 case 6:
                     logout();
                     break;
-
                 case -99:
                     System.out.println("Anda Belum Login.");
+                    break;
                 default:
                     System.out.println("Pilihan tidak sesuai. Coba lagi.");
             }
@@ -77,6 +78,7 @@ public class UASApplication {
 
     private void logout() {
         SessionManager.getInstance().logout();
+        System.out.println("Logout berhasil!");
     }
 
     private void deleteUser(Scanner scanner) {
@@ -84,6 +86,11 @@ public class UASApplication {
         System.out.print("Masukan email user yang akan dihapus: ");
         String email = scanner.nextLine();
 
+        if (userRepository.deleteUser(email)) {
+            System.out.println("User berhasil dihapus!");
+        } else {
+            System.out.println("Gagal menghapus user atau user tidak ditemukan!");
+        }
     }
 
     private void updateUser(Scanner scanner) {
@@ -94,10 +101,27 @@ public class UASApplication {
         String username = scanner.nextLine();
         System.out.print("Masukan password baru: ");
         String password = scanner.nextLine();
+
+        if (userRepository.updateUser(email, username, password)) {
+            System.out.println("User berhasil diupdate!");
+        } else {
+            System.out.println("Gagal mengupdate user atau user tidak ditemukan!");
+        }
     }
 
     private void tampilkanSemuaUser() {
-
+        List<User> users = userRepository.findAll();
+        System.out.println("\n=== Daftar Semua User ===");
+        if (users.isEmpty()) {
+            System.out.println("Tidak ada user yang terdaftar.");
+        } else {
+            for (int i = 0; i < users.size(); i++) {
+                User user = users.get(i);
+                System.out.println((i + 1) + ". Email: " + user.getEmail() +
+                        ", Username: " + user.getUsername());
+            }
+            System.out.println("Total users: " + users.size());
+        }
     }
 
     private void exitApps() {
@@ -111,6 +135,13 @@ public class UASApplication {
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
+
+        if (userRepository.authenticateUser(username, password)) {
+            SessionManager.getInstance().login();
+            System.out.println("Login berhasil! Selamat datang, " + username + "!");
+        } else {
+            System.out.println("Username atau password salah!");
+        }
     }
 
     private void insertUser(Scanner scanner) {
@@ -121,6 +152,12 @@ public class UASApplication {
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
+
+        if (userRepository.insertUser(email, username, password)) {
+            System.out.println("User berhasil ditambahkan!");
+        } else {
+            System.out.println("Gagal menambahkan user! Email atau username mungkin sudah digunakan.");
+        }
     }
 
     public static void main(String[] args) {

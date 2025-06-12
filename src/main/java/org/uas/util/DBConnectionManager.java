@@ -4,17 +4,26 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
 public class DBConnectionManager {
-    private static final String DB_URL = "jdbc:sqlite:dbuas.db";
+    private static DBConnectionManager instance;
     private static Connection connection;
+    private static final String DB_URL = "jdbc:sqlite:dbuas.db";
 
-    public static Connection getConnection() {
+
+    private DBConnectionManager() {
         try {
-            return DriverManager.getConnection(DB_URL);
+            connection = DriverManager.getConnection(DB_URL);
+            System.out.println("Database connection berhasil cuyy");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.err.println("Koneksi gagal cuyy: " + e.getMessage());
         }
     }
-}
 
+
+    public static synchronized Connection getConnection() {
+        if (instance == null) {
+            instance = new DBConnectionManager();
+        }
+        return connection;
+    }
+}

@@ -1,7 +1,7 @@
 package org.uas.data;
 
 public class User {
-    private String email; //should be unique
+    private String email;
     private String username;
     private String password;
 
@@ -11,7 +11,7 @@ public class User {
         this.setPassword(password);
     }
 
-    // Getters and setters
+
     public String getUsername() {
         return username;
     }
